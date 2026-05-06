@@ -1,0 +1,192 @@
+.page {
+  background: #0a0a0a;
+  min-height: 100vh;
+  color: #fff;
+}
+
+/* HERO */
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 1.5rem 5rem;
+  overflow: hidden;
+  min-height: 90vh;
+}
+
+.heroGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -60%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -60%) scale(1.1); }
+}
+
+.heroLogo {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #2a2a2a;
+  margin-bottom: 2rem;
+  animation: fadeDown 0.8s ease both;
+}
+
+.heroTitle {
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: 6px;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+  animation: fadeDown 0.8s ease 0.1s both;
+}
+
+.heroSub {
+  color: #888;
+  font-size: clamp(14px, 3vw, 18px);
+  margin-bottom: 8px;
+  animation: fadeDown 0.8s ease 0.2s both;
+}
+
+.heroSlogan {
+  color: #555;
+  font-size: 13px;
+  font-style: italic;
+  margin-bottom: 2.5rem;
+  animation: fadeDown 0.8s ease 0.3s both;
+}
+
+.heroCta {
+  display: inline-block;
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+  padding: 14px 36px;
+  border-radius: 100px;
+  transition: all 0.25s;
+  animation: fadeDown 0.8s ease 0.4s both;
+}
+
+.heroCta:hover {
+  background: #e0e0e0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255,255,255,0.1);
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* SECCIONES */
+.section {
+  padding: 4rem 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  color: #fff;
+}
+
+/* GRID CARDS */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #111;
+  border: 1px solid #1e1e1e;
+  border-radius: 16px;
+  padding: 28px 20px;
+  text-align: center;
+  transition: all 0.3s;
+  cursor: default;
+}
+
+.card:hover {
+  border-color: #333;
+  transform: translateY(-4px);
+  background: #161616;
+}
+
+.cardIcon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.cardDesc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* CTA FINAL */
+.ctaSection {
+  text-align: center;
+  padding: 5rem 1.5rem;
+  border-top: 1px solid #111;
+}
+
+.ctaTitle {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.ctaSub {
+  color: #666;
+  font-size: 15px;
+  margin-bottom: 2rem;
+}
+
+/* ANIMACION SCROLL */
+.fadeIn {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fadeIn.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .hero { min-height: 85vh; padding: 4rem 1rem 3rem; }
+  .grid { grid-template-columns: 1fr 1fr; }
+}

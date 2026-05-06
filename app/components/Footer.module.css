@@ -1,0 +1,125 @@
+.footer {
+    background: #080808;
+    border-top: 1px solid #141414;
+    padding: 3rem 2rem 2rem;
+    margin-top: 2rem;
+  }
+  
+  .top {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    flex-wrap: wrap;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #141414;
+  }
+  
+  .brand {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  
+  .logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #222;
+    flex-shrink: 0;
+  }
+  
+  .brandName {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #fff;
+    margin: 0 0 4px;
+  }
+  
+  .brandSub {
+    font-size: 12px;
+    color: #555;
+    margin: 0 0 6px;
+  }
+  
+  .slogan {
+    font-size: 11px;
+    color: #444;
+    font-style: italic;
+    margin: 0;
+  }
+  
+  .cols {
+    display: flex;
+    gap: 3rem;
+  }
+  
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .colTitle {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #444;
+    margin: 0 0 4px;
+  }
+  
+  .colLink {
+    font-size: 13px;
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .colLink:hover {
+    color: #fff;
+  }
+  
+  .bottom {
+    max-width: 860px;
+    margin: 1.5rem auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .copy {
+    font-size: 12px;
+    color: #333;
+    margin: 0;
+  }
+  
+  .waBtn {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    color: #110b0b;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 100px;
+    transition: all 0.2s;
+  }
+  
+  .waBtn:hover {
+    background: #1a1a1a;
+    border-color: #333;
+    color: #fff;
+  }
+  
+  @media (max-width: 600px) {
+    .top { flex-direction: column; }
+    .cols { gap: 2rem; }
+    .bottom { justify-content: center; text-align: center; }
+  }

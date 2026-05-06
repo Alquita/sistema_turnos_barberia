@@ -1,0 +1,282 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import emailjs from '@emailjs/browser'
+import toast from 'react-hot-toast'
+import { supabase } from '../../lib/supabase'
+import styles from './turno.module.css'
+
+const SERVICIOS = [
+  { id: 'corte', nombre: 'Corte de pelo', precio: '$16.000' },
+  { id: 'corte_barba', nombre: 'Corte + Barba', precio: '$25.000' },
+  { id: 'barba', nombre: 'Solo Barba', precio: '$11.000' },
+]
+
+const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+const TEMPLATE_BARBERO = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_BARBERO
+const TEMPLATE_CLIENTE = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_CLIENTE
+const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+
+function getHorariosParaDia(fecha) {
+  if (!fecha) return []
+  const dia = new Date(fecha + 'T00:00:00').getDay()
+  const esDiaHabil = dia >= 2 && dia <= 6
+  if (!esDiaHabil) return []
+  const horariosTarde = ['16:00', '17:00', '18:00', '19:00', '20:00']
+  const horariosMañana = ['08:00', '09:00', '10:00', '11:00']
+  if (dia === 2 || dia === 4) return [...horariosMañana, ...horariosTarde]
+  return horariosTarde
+}
+
+function getFechasDisponibles() {
+  const fechas = []
+  const hoy = new Date()
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(hoy)
+    d.setDate(hoy.getDate() + i)
+    const dia = d.getDay()
+    if (dia >= 2 && dia <= 6) fechas.push(d.toISOString().split('T')[0])
+  }
+  return fechas
+}
+
+const DIAS_ES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+const MESES_ES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+
+export default function Turno() {
+  const [form, setForm] = useState({
+    nombre: '', telefono: '', email: '', servicio: '', fecha: '', hora: '', direccion: ''
+  })
+  const [aceptaTerminos, setAceptaTerminos] = useState(false)
+  const [horariosOcupados, setHorariosOcupados] = useState([])
+  const [enviado, setEnviado] = useState(false)
+  const [cargando, setCargando] = useState(false)
+
+  const fechas = getFechasDisponibles()
+  const horarios = getHorariosParaDia(form.fecha)
+
+  useEffect(() => {
+    if (!form.fecha) return
+    const fetchOcupados = async () => {
+      const { data } = await supabase
+        .from('turnos')
+        .select('hora')
+        .eq('fecha', form.fecha)
+        .eq('cancelado', false)
+      setHorariosOcupados(data ? data.map(t => t.hora.slice(0, 5)) : [])
+    }
+    fetchOcupados()
+  }, [form.fecha])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    if (!form.nombre.trim()) return toast.error('Ingresá tu nombre completo')
+    if (!form.telefono.trim()) return toast.error('Ingresá tu teléfono')
+    if (!form.email.trim()) return toast.error('Ingresá tu email')
+    if (!form.servicio) return toast.error('Elegí un servicio')
+    if (!form.fecha) return toast.error('Seleccioná una fecha')
+    if (!form.hora) return toast.error('Seleccioná un horario')
+    if (!form.direccion.trim()) return toast.error('Ingresá tu dirección')
+    if (!aceptaTerminos) return toast.error('Debés aceptar los términos para continuar')
+
+    setCargando(true)
+
+    const { data: yaReservado } = await supabase
+      .from('turnos')
+      .select('id')
+      .eq('fecha', form.fecha)
+      .eq('hora', form.hora)
+      .eq('cancelado', false)
+
+    if (yaReservado && yaReservado.length > 0) {
+      toast.error('Ese turno ya fue reservado. Elegí otro horario.')
+      setHorariosOcupados(prev => [...prev, form.hora])
+      setForm(prev => ({ ...prev, hora: '' }))
+      setCargando(false)
+      return
+    }
+
+    const res = await fetch('/api/reserva', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    })
+    const data = await res.json()
+
+    if (!data.success) {
+      toast.error('Hubo un error al guardar. Intentá de nuevo.')
+      setCargando(false)
+      return
+    }
+
+    const servicioNombre = SERVICIOS.find(s => s.id === form.servicio)?.nombre || form.servicio
+
+    const templateParams = {
+      nombre: form.nombre,
+      telefono: form.telefono,
+      email_cliente: form.email,
+      servicio: servicioNombre,
+      fecha: form.fecha,
+      hora: form.hora,
+      direccion: form.direccion,
+      maps_link: data.mapsLink,
+      cancel_link: data.cancelLink,
+      mensaje_extra: '',
+    }
+
+    try {
+      await toast.promise(
+        Promise.all([
+          emailjs.send(SERVICE_ID, TEMPLATE_BARBERO, templateParams, PUBLIC_KEY),
+          emailjs.send(SERVICE_ID, TEMPLATE_CLIENTE, templateParams, PUBLIC_KEY),
+        ]),
+        {
+          loading: '✉ Enviando confirmación por email...',
+          success: '¡Emails enviados! Revisá tu bandeja.',
+          error: 'El turno se guardó pero hubo un error al enviar el email.',
+        }
+      )
+    } catch (err) {
+      console.error('EmailJS error:', err)
+    }
+
+    setEnviado(true)
+    setCargando(false)
+  }
+
+  const resetForm = () => {
+    setEnviado(false)
+    setAceptaTerminos(false)
+    setForm({ nombre: '', telefono: '', email: '', servicio: '', fecha: '', hora: '', direccion: '' })
+    setHorariosOcupados([])
+  }
+
+  if (enviado) return (
+    <div className={styles.successWrap}>
+      <div className={styles.successCard}>
+        <div className={styles.checkCircle}>✓</div>
+        <h2 className={styles.successTitle}>¡Turno confirmado!</h2>
+        <p className={styles.successSub}>Te enviamos un email de confirmación con todos los detalles. Revisá tu bandeja de entrada.</p>
+        <button onClick={resetForm} className={styles.btnSecondary}>Reservar otro turno</button>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <span className={styles.badge}>✂ Nuevo turno</span>
+          <h1 className={styles.title}>Reservá tu turno</h1>
+          <p className={styles.sub}>Martes a Sábados · Río Cuarto</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label}>Nombre completo</label>
+              <input name="nombre" value={form.nombre}
+                onChange={e => setForm({...form, nombre: e.target.value})}
+                placeholder="Juan García" className={styles.input} />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Teléfono / WhatsApp</label>
+              <input name="telefono" value={form.telefono}
+                onChange={e => setForm({...form, telefono: e.target.value})}
+                placeholder="3584001234" className={styles.input} />
+            </div>
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>Email</label>
+            <input type="email" name="email" value={form.email}
+              onChange={e => setForm({...form, email: e.target.value})}
+              placeholder="tucorreo@gmail.com" className={styles.input} />
+            <span className={styles.hint}>Te enviamos la confirmación y el link para cancelar a este correo.</span>
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>Servicio</label>
+            <select name="servicio" value={form.servicio}
+              onChange={e => setForm({...form, servicio: e.target.value})}
+              className={styles.select}>
+              <option value="">Elegí un servicio</option>
+              {SERVICIOS.map(s => (
+                <option key={s.id} value={s.id}>{s.nombre} — {s.precio}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>Fecha</label>
+            <div className={styles.fechasGrid}>
+              {fechas.map(f => {
+                const d = new Date(f + 'T00:00:00')
+                return (
+                  <button type="button" key={f}
+                    onClick={() => setForm({...form, fecha: f, hora: ''})}
+                    className={`${styles.fechaBtn} ${form.fecha === f ? styles.fechaBtnActive : ''}`}>
+                    <span className={styles.fechaDia}>{DIAS_ES[d.getDay()]}</span>
+                    <span className={styles.fechaNum}>{d.getDate()}</span>
+                    <span className={styles.fechaMes}>{MESES_ES[d.getMonth()]}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {form.fecha && (
+            <div className={styles.field}>
+              <label className={styles.label}>Horario</label>
+              {horarios.length === 0 ? (
+                <p className={styles.hint}>No hay turnos disponibles este día.</p>
+              ) : (
+                <div className={styles.horariosGrid}>
+                  {horarios.map(h => {
+                    const ocupado = horariosOcupados.includes(h)
+                    return (
+                      <button type="button" key={h}
+                        disabled={ocupado}
+                        onClick={() => !ocupado && setForm({...form, hora: h})}
+                        className={`${styles.horarioBtn} ${ocupado ? styles.horarioBtnOcupado : ''} ${form.hora === h ? styles.horarioBtnActive : ''}`}>
+                        {h}
+                        {ocupado && <span className={styles.ocupadoTag}>Ocupado</span>}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className={styles.field}>
+            <label className={styles.label}>Dirección</label>
+            <input name="direccion" value={form.direccion}
+              onChange={e => setForm({...form, direccion: e.target.value})}
+              placeholder="Ej: San Martín 456, Río Cuarto"
+              className={styles.input} />
+            <span className={styles.hint}>Solo realizamos servicios dentro de Río Cuarto.</span>
+          </div>
+
+          <div className={styles.terminosWrap}>
+            <label className={styles.terminosLabel}>
+              <input type="checkbox" checked={aceptaTerminos}
+                onChange={e => setAceptaTerminos(e.target.checked)}
+                className={styles.checkbox} />
+              <span>
+                Entiendo y acepto que <strong>Cepeha Fade Club se reserva el derecho de cancelar o reprogramar el turno</strong> en caso de que la dirección indicada se encuentre fuera del área de cobertura habitual, presente condiciones de acceso que comprometan la seguridad del profesional, o por causas de fuerza mayor debidamente justificadas. En tales casos, el prestador se compromete a notificar al cliente con la mayor anticipación posible a través de los medios de contacto proporcionados en esta reserva.
+              </span>
+            </label>
+          </div>
+
+          <button type="submit" disabled={cargando} className={styles.btnPrimary}>
+            {cargando ? 'Enviando...' : 'Confirmar turno →'}
+          </button>
+
+        </form>
+      </div>
+    </div>
+  )
+}

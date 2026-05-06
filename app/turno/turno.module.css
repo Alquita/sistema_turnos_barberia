@@ -1,0 +1,349 @@
+.page {
+    background: #0a0a0a;
+    min-height: 100vh;
+    padding: 3rem 1rem 5rem;
+  }
+  
+  .container {
+    max-width: 580px;
+    margin: 0 auto;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  
+  .badge {
+    display: inline-block;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: #888;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+  
+  .title {
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  
+  .sub {
+    color: #555;
+    font-size: 14px;
+  }
+  
+  .form {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+  
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .input, .select {
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: #fff;
+    font-size: 15px;
+    transition: border-color 0.2s;
+    width: 100%;
+    font-family: inherit;
+  }
+  
+  .input:focus, .select:focus {
+    outline: none;
+    border-color: #444;
+  }
+  
+  .input::placeholder {
+    color: #444;
+  }
+  
+  .select option {
+    background: #111;
+  }
+  
+  .hint {
+    font-size: 11px;
+    color: #444;
+  }
+  
+  .error {
+    background: #1a0808;
+    border: 1px solid #5a1a1a;
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #f87171;
+    font-size: 14px;
+  }
+  
+  .btnPrimary {
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 100px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  
+  .btnPrimary:hover {
+    background: #e0e0e0;
+    transform: translateY(-1px);
+  }
+  
+  .btnPrimary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .successWrap {
+    background: #0a0a0a;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  
+  .successCard {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    animation: fadeUp 0.6s ease both;
+  }
+  
+  .checkCircle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #0f2a1a;
+    border: 1px solid #1a4a2a;
+    color: #4ade80;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+  
+  .successTitle {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  
+  .successSub {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+  
+  .btnSecondary {
+    background: transparent;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 100px;
+    padding: 11px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btnSecondary:hover {
+    background: #1a1a1a;
+    border-color: #444;
+  }
+  
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @media (max-width: 500px) {
+    .row { grid-template-columns: 1fr; }
+    .form { padding: 1.5rem; }
+  }
+  
+  .fechasGrid {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+  
+  .fechasGrid::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .fechaBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    min-width: 56px;
+  }
+  
+  .fechaBtn:hover {
+    border-color: #444;
+  }
+  
+  .fechaBtnActive {
+    background: #fff;
+    border-color: #fff;
+  }
+  
+  .fechaBtnActive .fechaDia,
+  .fechaBtnActive .fechaNum,
+  .fechaBtnActive .fechaMes {
+    color: #000 !important;
+  }
+  
+  .fechaDia {
+    font-size: 10px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .fechaNum {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+  }
+  
+  .fechaMes {
+    font-size: 10px;
+    color: #555;
+  }
+  
+  .horariosGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 8px;
+  }
+  
+  .horarioBtn {
+    position: relative;
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 12px 8px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .horarioBtn:hover:not(:disabled) {
+    border-color: #444;
+    background: #161616;
+  }
+  
+  .horarioBtnActive {
+    background: #fff !important;
+    border-color: #fff !important;
+    color: #000 !important;
+  }
+  
+  .horarioBtnOcupado {
+    opacity: 0.35;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+  
+  .ocupadoTag {
+    font-size: 9px;
+    color: #666;
+    font-weight: 400;
+    text-decoration: none;
+  }
+  .terminosWrap {
+    background: #0f0f0f;
+    border: 1px solid #1e1e1e;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  
+  .terminosLabel {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    cursor: pointer;
+    font-size: 12px;
+    color: #777;
+    line-height: 1.7;
+  }
+  
+  .terminosLabel strong {
+    color: #aaa;
+  }
+  
+  .checkbox {
+    margin-top: 3px;
+    flex-shrink: 0;
+    accent-color: #fff;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }

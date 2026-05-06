@@ -1,0 +1,271 @@
+.page {
+    background: #0a0a0a;
+    min-height: 100vh;
+    color: #fff;
+  }
+  
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 4rem 1rem 2rem;
+    animation: fadeUp 0.7s ease both;
+  }
+  
+  .logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #222;
+    margin-bottom: 1.5rem;
+  }
+  
+  .title {
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  
+  .sub {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .section {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem;
+  }
+  
+  .sectionSub {
+    color: #555;
+    font-size: 13px;
+    margin-bottom: 1.2rem;
+    margin-top: -0.5rem;
+  }
+  
+  .bioCard {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 18px;
+    padding: 2rem;
+    animation: fadeUp 0.7s ease 0.1s both;
+  }
+  
+  .bio {
+    color: #aaa;
+    font-size: 15px;
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+  
+  .slogan {
+    color: #555;
+    font-size: 13px;
+    display: block;
+    margin-top: 8px;
+  }
+  
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    animation: fadeUp 0.7s ease 0.2s both;
+  }
+  
+  .stat {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 14px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  
+  .stat:hover {
+    border-color: #333;
+    transform: translateY(-3px);
+  }
+  
+  .statNum {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  
+  .statLabel {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+  }
+  
+  .sectionTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  
+  /* FAMOSOS */
+  .famososGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+    animation: fadeUp 0.7s ease 0.25s both;
+  }
+  
+  .famososCard {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  
+  .famososCard:hover {
+    border-color: #333;
+    transform: translateY(-3px);
+    background: #161616;
+  }
+  
+  .famososIcon {
+    font-size: 18px;
+  }
+  
+  .famososNombre {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
+  
+  .famososCategoria {
+    font-size: 11px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .ghList {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: fadeUp 0.7s ease 0.3s both;
+  }
+  
+  .ghItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #aaa;
+  }
+  
+  .ghDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #444;
+    flex-shrink: 0;
+  }
+  
+  /* SERVICIOS */
+  .servicios {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 18px;
+    overflow: hidden;
+    animation: fadeUp 0.7s ease 0.35s both;
+  }
+  
+  .servicioRow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #1a1a1a;
+    transition: background 0.2s;
+  }
+  
+  .servicioRow:last-child { border-bottom: none; }
+  .servicioRow:hover { background: #161616; }
+  
+  .servicioIcon {
+    font-size: 20px;
+    width: 32px;
+    text-align: center;
+  }
+  
+  .servicioNombre {
+    flex: 1;
+    font-size: 15px;
+    color: #ddd;
+  }
+  
+  .servicioPrecio {
+    font-size: 14px;
+    font-weight: 700;
+    color: #666;
+  }
+  
+  /* CTA */
+  .cta {
+    text-align: center;
+    padding: 4rem 1.5rem 6rem;
+    animation: fadeUp 0.7s ease 0.4s both;
+  }
+  
+  .ctaTitle {
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  
+  .ctaSub {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 2rem;
+  }
+  
+  .btn {
+    display: inline-block;
+    background: #fff;
+    color: #000;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 13px 36px;
+    border-radius: 100px;
+    transition: all 0.2s;
+  }
+  
+  .btn:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+  }
+  
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @media (max-width: 500px) {
+    .stats { grid-template-columns: 1fr; }
+    .famososGrid { grid-template-columns: repeat(2, 1fr); }
+  }
