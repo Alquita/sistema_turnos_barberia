@@ -12,6 +12,16 @@ const SERVICIOS = [
   { id: 'barba', nombre: 'Solo Barba', precio: '$11.000' },
 ]
 
+const PAISES = [
+  { codigo: '🇦🇷 +54 9', valor: '549', placeholder: '3584001234', largo: 10 },
+  { codigo: '🇺🇾 +598', valor: '598', placeholder: '91234567', largo: 8 },
+  { codigo: '🇧🇴 +591', valor: '591', placeholder: '71234567', largo: 8 },
+  { codigo: '🇨🇱 +56', valor: '56', placeholder: '912345678', largo: 9 },
+  { codigo: '🇵🇾 +595', valor: '595', placeholder: '981234567', largo: 9 },
+  { codigo: '🇧🇷 +55', valor: '55', placeholder: '11912345678', largo: 11 },
+  { codigo: '🇪🇸 +34', valor: '34', placeholder: '612345678', largo: 9 },
+]
+
 const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
 const TEMPLATE_BARBERO = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_BARBERO
 const TEMPLATE_CLIENTE = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_CLIENTE
@@ -47,6 +57,7 @@ export default function Turno() {
   const [form, setForm] = useState({
     nombre: '', telefono: '', email: '', servicio: '', fecha: '', hora: '', direccion: ''
   })
+  const [paisSeleccionado, setPaisSeleccionado] = useState(PAISES[0])
   const [aceptaTerminos, setAceptaTerminos] = useState(false)
   const [horariosOcupados, setHorariosOcupados] = useState([])
   const [enviado, setEnviado] = useState(false)
@@ -97,10 +108,12 @@ export default function Turno() {
       return
     }
 
+    const telefonoCompleto = `${paisSeleccionado.valor}${form.telefono}`
+
     const res = await fetch('/api/reserva', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, telefono: telefonoCompleto }),
     })
     const data = await res.json()
 
@@ -114,7 +127,7 @@ export default function Turno() {
 
     const templateParams = {
       nombre: form.nombre,
-      telefono: form.telefono,
+      telefono: telefonoCompleto,
       email_cliente: form.email,
       servicio: servicioNombre,
       fecha: form.fecha,
@@ -182,11 +195,35 @@ export default function Turno() {
                 onChange={e => setForm({...form, nombre: e.target.value})}
                 placeholder="Juan García" className={styles.input} />
             </div>
+
             <div className={styles.field}>
               <label className={styles.label}>Teléfono / WhatsApp</label>
-              <input name="telefono" value={form.telefono}
-                onChange={e => setForm({...form, telefono: e.target.value})}
-                placeholder="3584001234" className={styles.input} />
+              <div className={styles.telefonoWrap}>
+                <select
+                  className={styles.paisSelect}
+                  value={paisSeleccionado.valor}
+                  onChange={e => {
+                    const p = PAISES.find(p => p.valor === e.target.value)
+                    setPaisSeleccionado(p)
+                    setForm({...form, telefono: ''})
+                  }}>
+                  {PAISES.map(p => (
+                    <option key={p.valor} value={p.valor}>{p.codigo}</option>
+                  ))}
+                </select>
+                <input
+                  name="telefono"
+                  value={form.telefono}
+                  onChange={e => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, paisSeleccionado.largo)
+                    setForm({...form, telefono: val})
+                  }}
+                  placeholder={paisSeleccionado.placeholder}
+                  className={styles.telefonoInput}
+                  inputMode="numeric"
+                />
+              </div>
+              <span className={styles.hint}>Sin el 0 ni el 15. Ej: {paisSeleccionado.placeholder}</span>
             </div>
           </div>
 

@@ -347,3 +347,52 @@
     height: 15px;
     cursor: pointer;
   }
+  .telefonoWrap {
+    display: flex;
+    align-items: center;
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  
+  .telefonoWrap:focus-within {
+    border-color: #444;
+  }
+  
+  .paisSelect {
+    background: #161616;
+    border: none;
+    border-right: 1px solid #222;
+    color: #ccc;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 11px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    flex-shrink: 0;
+    appearance: auto;
+  }
+  
+  .paisSelect:focus {
+    outline: none;
+  }
+  
+  .telefonoInput {
+    background: transparent;
+    border: none;
+    padding: 11px 14px;
+    color: #fff;
+    font-size: 15px;
+    width: 100%;
+    font-family: inherit;
+  }
+  
+  .telefonoInput:focus {
+    outline: none;
+  }
+  
+  .telefonoInput::placeholder {
+    color: #444;
+  }
