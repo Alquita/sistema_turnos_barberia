@@ -12,13 +12,16 @@ export async function POST(req) {
 
   if (sbError) return Response.json({ error: 'Error al guardar el turno' }, { status: 500 })
 
-  const cancelLink = `${process.env.NEXT_PUBLIC_URL}/cancelar?token=${turno.token_cancelacion}`
+  const baseUrl = process.env.NEXT_PUBLIC_URL
+  const cancelLink = `${baseUrl}/cancelar?token=${turno.token_cancelacion}`
+  const cancelLinkBarbero = `${baseUrl}/cancelar-barbero?token=${turno.token_cancelacion}`
   const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion + ', Río Cuarto, Córdoba')}`
 
   return Response.json({ 
     success: true, 
     token: turno.token_cancelacion,
     cancelLink,
+    cancelLinkBarbero,
     mapsLink
   })
 }

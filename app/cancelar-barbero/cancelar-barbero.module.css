@@ -1,0 +1,44 @@
+.wrap {
+    background: #0a0a0a;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  
+  .card {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    animation: fadeUp 0.5s ease both;
+  }
+  
+  .icon { font-size: 48px; margin-bottom: 1rem; }
+  .title { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
+  .sub { color: #777; font-size: 14px; line-height: 1.7; margin-bottom: 2rem; }
+  
+  .btnDanger {
+    background: #7f1d1d;
+    color: #fca5a5;
+    border: 1px solid #991b1b;
+    border-radius: 100px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  
+  .btnDanger:hover { background: #991b1b; }
+  .errorTxt { color: #666; }
+  
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }

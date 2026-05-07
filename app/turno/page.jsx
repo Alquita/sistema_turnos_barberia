@@ -122,6 +122,7 @@ export default function Turno() {
       direccion: form.direccion,
       maps_link: data.mapsLink,
       cancel_link: data.cancelLink,
+      cancel_link_barbero: data.cancelLinkBarbero,
       mensaje_extra: '',
     }
 
