@@ -27,6 +27,43 @@ const TEMPLATE_BARBERO = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_BARBERO
 const TEMPLATE_CLIENTE = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_CLIENTE
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
 
+// Hora actual en Argentina (UTC-3), actualizada cada minuto
+function getNowArgentina() {
+  const now = new Date()
+  // Convertir a UTC-3
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000
+  return new Date(utc - 3 * 60 * 60 * 1000)
+}
+
+function esTurnoDeshabilitado(fechaTurno, horaTurno) {
+  const ahora = getNowArgentina()
+  const [h, m] = horaTurno.split(':').map(Number)
+  const turno = new Date(fechaTurno + 'T00:00:00')
+  turno.setHours(h, m, 0, 0)
+
+  // Deshabilitar si faltan menos de 30 minutos o ya pasó
+  const diffMs = turno.getTime() - ahora.getTime()
+  return diffMs < 30 * 60 * 1000
+}
+
+function getFechasDisponibles() {
+  const fechas = []
+  const ahora = getNowArgentina()
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(ahora)
+    d.setDate(ahora.getDate() + i)
+    const dia = d.getDay()
+    if (dia >= 2 && dia <= 6) {
+      const fecha = d.toISOString().split('T')[0]
+      // Verificar que el día tenga al menos un horario disponible
+      const horarios = getHorariosParaDia(fecha)
+      const hayDisponibles = horarios.some(h => !esTurnoDeshabilitado(fecha, h))
+      if (hayDisponibles) fechas.push(fecha)
+    }
+  }
+  return fechas
+}
+
 function getHorariosParaDia(fecha) {
   if (!fecha) return []
   const dia = new Date(fecha + 'T00:00:00').getDay()
@@ -36,18 +73,6 @@ function getHorariosParaDia(fecha) {
   const horariosMañana = ['08:00', '09:00', '10:00', '11:00']
   if (dia === 2 || dia === 4) return [...horariosMañana, ...horariosTarde]
   return horariosTarde
-}
-
-function getFechasDisponibles() {
-  const fechas = []
-  const hoy = new Date()
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(hoy)
-    d.setDate(hoy.getDate() + i)
-    const dia = d.getDay()
-    if (dia >= 2 && dia <= 6) fechas.push(d.toISOString().split('T')[0])
-  }
-  return fechas
 }
 
 const DIAS_ES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
@@ -62,6 +87,15 @@ export default function Turno() {
   const [horariosOcupados, setHorariosOcupados] = useState([])
   const [enviado, setEnviado] = useState(false)
   const [cargando, setCargando] = useState(false)
+  const [ahora, setAhora] = useState(getNowArgentina())
+
+  // Actualizar el reloj cada 30 segundos para recalcular horarios
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAhora(getNowArgentina())
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const fechas = getFechasDisponibles()
   const horarios = getHorariosParaDia(form.fecha)
@@ -79,6 +113,14 @@ export default function Turno() {
     fetchOcupados()
   }, [form.fecha])
 
+  // Si el horario seleccionado se vuelve inválido por el tiempo, limpiarlo
+  useEffect(() => {
+    if (form.hora && form.fecha && esTurnoDeshabilitado(form.fecha, form.hora)) {
+      setForm(prev => ({ ...prev, hora: '' }))
+      toast.error('El horario seleccionado ya no está disponible.')
+    }
+  }, [ahora])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -90,6 +132,13 @@ export default function Turno() {
     if (!form.hora) return toast.error('Seleccioná un horario')
     if (!form.direccion.trim()) return toast.error('Ingresá tu dirección')
     if (!aceptaTerminos) return toast.error('Debés aceptar los términos para continuar')
+
+    // Verificación final de tiempo
+    if (esTurnoDeshabilitado(form.fecha, form.hora)) {
+      toast.error('Este horario ya no está disponible. Elegí otro.')
+      setForm(prev => ({ ...prev, hora: '' }))
+      return
+    }
 
     setCargando(true)
 
@@ -274,13 +323,16 @@ export default function Turno() {
                 <div className={styles.horariosGrid}>
                   {horarios.map(h => {
                     const ocupado = horariosOcupados.includes(h)
+                    const pasado = esTurnoDeshabilitado(form.fecha, h)
+                    const deshabilitado = ocupado || pasado
                     return (
                       <button type="button" key={h}
-                        disabled={ocupado}
-                        onClick={() => !ocupado && setForm({...form, hora: h})}
-                        className={`${styles.horarioBtn} ${ocupado ? styles.horarioBtnOcupado : ''} ${form.hora === h ? styles.horarioBtnActive : ''}`}>
+                        disabled={deshabilitado}
+                        onClick={() => !deshabilitado && setForm({...form, hora: h})}
+                        className={`${styles.horarioBtn} ${deshabilitado ? styles.horarioBtnOcupado : ''} ${form.hora === h ? styles.horarioBtnActive : ''}`}>
                         {h}
                         {ocupado && <span className={styles.ocupadoTag}>Ocupado</span>}
+                        {!ocupado && pasado && <span className={styles.ocupadoTag}>No disp.</span>}
                       </button>
                     )
                   })}

@@ -78,3 +78,101 @@
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  .timerOk {
+    background: #0a1f12;
+    border: 1px solid #1a4a2a;
+    border-radius: 16px;
+    padding: 20px 16px;
+    margin: 16px 0 20px;
+    text-align: center;
+  }
+  
+  .timerVencido {
+    background: #1a0808;
+    border: 1px solid #5a1a1a;
+    border-radius: 16px;
+    padding: 20px 16px;
+    color: #f87171;
+    margin: 16px 0 20px;
+    text-align: center;
+  }
+  
+  .timerLabel {
+    font-size: 11px;
+    color: #4ade80;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.7;
+    margin-bottom: 8px;
+  }
+  
+  .timerClock {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #4ade80;
+    letter-spacing: 6px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .timerDots {
+    opacity: 0.6;
+    animation: blink 1s step-end infinite;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.1; }
+  }
+  
+  .timerBar {
+    background: #1a3a22;
+    border-radius: 100px;
+    height: 4px;
+    margin: 12px 0 8px;
+    overflow: hidden;
+  }
+  
+  .timerBarFill {
+    height: 100%;
+    background: #4ade80;
+    border-radius: 100px;
+    transition: width 1s linear;
+  }
+  
+  .timerSub {
+    font-size: 11px;
+    color: #4ade80;
+    opacity: 0.5;
+  }
+  
+  .timerClock {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #4ade80;
+    letter-spacing: 4px;
+    line-height: 1;
+    margin: 8px 0 4px;
+  }
+  
+  .btnDisabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+  }
+  
+  .btnWa {
+    display: inline-block;
+    background: #25D366;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 28px;
+    border-radius: 100px;
+    transition: all 0.2s;
+    margin-top: 1rem;
+  }
+  
+  .btnWa:hover {
+    background: #1da855;
+  }
