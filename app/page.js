@@ -11,6 +11,37 @@ const SERVICIOS = [
   { icon: '👁️', titulo: 'Cejas', desc: 'Detalle que marca la diferencia' },
 ]
 
+const RESEÑAS = [
+  {
+    nombre: 'Tomás García',
+    inicial: 'T',
+    foto: '/img/corte1.jpeg',
+    texto: 'Vino a domicilio y el corte quedó perfecto. Super puntual y profesional. 100% recomendable.',
+    tiempo: 'Hace 2 semanas',
+  },
+  {
+    nombre: 'Matías Rodríguez',
+    inicial: 'M',
+    foto: '/img/corte2.jpeg',
+    texto: 'El mejor barbero a domicilio de Río Cuarto. Se nota la dedicación en cada detalle. Ya saqué turno de nuevo.',
+    tiempo: 'Hace 1 semana',
+  },
+  {
+    nombre: 'Luciano Pérez',
+    inicial: 'L',
+    foto: '/img/corte3.jpeg',
+    texto: 'Me sorprendió la calidad del trabajo. El fade quedó impecable y el trato muy bueno.',
+    tiempo: 'Hace 3 días',
+  },
+  {
+    nombre: 'Agustín López',
+    inicial: 'A',
+    foto: '/img/corte4.jpeg',
+    texto: 'Vine por recomendación y no me arrepentí. Muy buen ambiente y el corte tal cual lo pedí. Crack.',
+    tiempo: 'Hace 5 días',
+  },
+]
+
 export default function Home() {
   const heroRef = useRef(null)
 
@@ -45,6 +76,45 @@ export default function Home() {
               <span className={styles.cardIcon}>{s.icon}</span>
               <h3 className={styles.cardTitle}>{s.titulo}</h3>
               <p className={styles.cardDesc}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* RESEÑAS */}
+      <section className={styles.section}>
+        <div className={`${styles.reseñasHeader} ${styles.fadeIn}`}>
+          <h2 className={styles.sectionTitle}>Lo que dicen los clientes</h2>
+          <div className={styles.ratingBadge}>
+            <span className={styles.ratingNum}>5.0</span>
+            <div>
+              <div className={styles.estrellas}>★★★★★</div>
+              <span className={styles.ratingLabel}>Basado en reseñas reales</span>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.reseñasGrid}>
+          {RESEÑAS.map((r, i) => (
+            <div key={r.nombre} className={`${styles.reseñaCard} ${styles.fadeIn}`}
+              style={{ animationDelay: `${i * 0.1}s` }}>
+              <div className={styles.reseñaImgWrap}>
+                <img src={r.foto} alt={`Corte de ${r.nombre}`} className={styles.reseñaAvatar} />
+              </div>
+              <div className={styles.reseñaBody}>
+                <div className={styles.reseñaTop}>
+                  <div className={styles.reseñaEstrellas}>★★★★★</div>
+                  <span className={styles.reseñaTiempo}>{r.tiempo}</span>
+                </div>
+                <p className={styles.reseñaTexto}>"{r.texto}"</p>
+                <div className={styles.reseñaFooter}>
+                  <div className={styles.reseñaAvatarMini}>{r.inicial}</div>
+                  <div>
+                    <p className={styles.reseñaNombre}>{r.nombre}</p>
+                    <p className={styles.reseñaCliente}>Cliente verificado ✓</p>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>

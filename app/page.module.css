@@ -190,3 +190,162 @@
   .hero { min-height: 85vh; padding: 4rem 1rem 3rem; }
   .grid { grid-template-columns: 1fr 1fr; }
 }
+/* RESEÑAS */
+.reseñasHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.ratingBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #111;
+  border: 1px solid #1e1e1e;
+  border-radius: 12px;
+  padding: 10px 16px;
+}
+
+.ratingNum {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+.estrellas {
+  font-size: 14px;
+  color: #FBBC04;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+
+.ratingLabel {
+  font-size: 11px;
+  color: #555;
+}
+
+.reseñasGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.reseñaCard {
+  background: #111;
+  border: 1px solid #1e1e1e;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s;
+}
+
+.reseñaCard:hover {
+  border-color: #2a2a2a;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+}
+
+.reseñaImgWrap {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  position: relative;
+}
+
+.reseñaImgWrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+}
+
+.reseñaAvatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.reseñaCard:hover .reseñaAvatar {
+  transform: scale(1.05);
+}
+
+.reseñaBody {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.reseñaTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reseñaEstrellas {
+  font-size: 14px;
+  color: #FBBC04;
+  letter-spacing: 2px;
+}
+
+.reseñaTiempo {
+  font-size: 11px;
+  color: #444;
+}
+
+.reseñaTexto {
+  font-size: 13px;
+  color: #888;
+  line-height: 1.75;
+  margin: 0;
+  flex: 1;
+  font-style: italic;
+}
+
+.reseñaFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #1a1a1a;
+}
+
+.reseñaAvatarMini {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #666;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.reseñaNombre {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.reseñaCliente {
+  font-size: 11px;
+  color: #555;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .reseñasGrid { grid-template-columns: 1fr; }
+  .reseñasHeader { flex-direction: column; align-items: flex-start; }
+}

@@ -2,17 +2,15 @@ import Link from 'next/link'
 import styles from './conoceme.module.css'
 
 const FAMOSOS = [
-  { nombre: 'Alonso', categoria: 'Influencer' },
-  { nombre: 'Frankillo', categoria: 'Influencer' },
-  { nombre: 'Tomás Mazza', categoria: 'Influencer' },
-  { nombre: 'El Loco Paul', categoria: 'Influencer' },
-  { nombre: 'Tita', categoria: 'Influencer' },
-  { nombre: 'Teo DM', categoria: 'Influencer' },
-  { nombre: 'Monxi', categoria: 'Influencer' },
-  { nombre: 'Santiago Fernandez', categoria: 'Futbolista' },
-  { nombre: 'El Negro Onty', categoria: 'Participante de GH' },
-
-
+  { nombre: 'Alonso', categoria: 'Influencer', foto: '/img/alonso.jpeg' },
+  { nombre: 'Frankillo', categoria: 'Influencer', foto: '/img/frankillo.jpeg' },
+  { nombre: 'Tomás Mazza', categoria: 'Influencer', foto: '/img/mazza.jpeg' },
+  { nombre: 'El Loco Paul', categoria: 'Influencer', foto: '/img/locopaul.jpeg' },
+  { nombre: 'Tita', categoria: 'Influencer', foto: '/img/tita.jpeg' },
+  { nombre: 'Teo DM', categoria: 'Influencer', foto: '/img/teo.jpeg' },
+  { nombre: 'Monxi', categoria: 'Influencer', foto: '/img/monxi.jpeg' },
+  { nombre: 'Santiago Fernandez', categoria: 'Futbolista', foto: null },
+  { nombre: 'El Negro Onty', categoria: 'GH', foto: null },
 ]
 
 const GH = [
@@ -71,11 +69,18 @@ export default function Conoceme() {
         <p className={styles.sectionSub}>Le cortó el pelo a figuras del deporte, el espectáculo y las redes.</p>
 
         <div className={styles.famososGrid}>
-          {FAMOSOS.map(f => (
+          {FAMOSOS.filter(f => f.foto).map(f => (
             <div key={f.nombre} className={styles.famososCard}>
-              <span className={styles.famososIcon}>✂️</span>
-              <span className={styles.famososNombre}>{f.nombre}</span>
-              <span className={styles.famososCategoria}>{f.categoria}</span>
+              <div className={styles.famososImgWrap}>
+                <img src={f.foto} alt={f.nombre} className={styles.famososImg} />
+                <div className={styles.famososOverlay}>
+                  <span className={styles.famososScissor}>✂</span>
+                </div>
+              </div>
+              <div className={styles.famososInfo}>
+                <span className={styles.famososNombre}>{f.nombre}</span>
+                <span className={styles.famososCategoria}>{f.categoria}</span>
+              </div>
             </div>
           ))}
         </div>
@@ -90,6 +95,19 @@ export default function Conoceme() {
         </div>
       </section>
 
+      {/* GALERIA CORTES */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Trabajos recientes</h2>
+        <p className={styles.sectionSub}>Algunos de los cortes más recientes.</p>
+        <div className={styles.galeriaGrid}>
+          {['/img/corte1.jpeg', '/img/corte2.jpeg', '/img/corte3.jpeg', '/img/corte4.jpeg'].map((src, i) => (
+            <div key={i} className={styles.galeriaItem}>
+              <img src={src} alt={`Corte ${i + 1}`} className={styles.galeriaImg} />
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* SERVICIOS */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>¿Qué hago?</h2>
@@ -98,7 +116,7 @@ export default function Conoceme() {
             { icon: '✂️', nombre: 'Corte de pelo', precio: '$16.000' },
             { icon: '🪒', nombre: 'Corte + Barba', precio: '$25.000' },
             { icon: '🧔', nombre: 'Solo Barba', precio: '$11.000' },
-            { icon: '👁️', nombre: 'Cejas', precio: 'de regalo🎁' },
+            { icon: '👁️', nombre: 'Cejas', precio: 'de regalo 🎁' },
           ].map(s => (
             <div key={s.nombre} className={styles.servicioRow}>
               <span className={styles.servicioIcon}>{s.icon}</span>
