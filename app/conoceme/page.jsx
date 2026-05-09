@@ -95,19 +95,6 @@ export default function Conoceme() {
         </div>
       </section>
 
-      {/* GALERIA CORTES */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Trabajos recientes</h2>
-        <p className={styles.sectionSub}>Algunos de los cortes más recientes.</p>
-        <div className={styles.galeriaGrid}>
-          {['/img/corte1.jpeg', '/img/corte2.jpeg', '/img/corte3.jpeg', '/img/corte4.jpeg'].map((src, i) => (
-            <div key={i} className={styles.galeriaItem}>
-              <img src={src} alt={`Corte ${i + 1}`} className={styles.galeriaImg} />
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* SERVICIOS */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>¿Qué hago?</h2>
