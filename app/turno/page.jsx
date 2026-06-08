@@ -7,9 +7,12 @@ import { supabase } from '../../lib/supabase'
 import styles from './turno.module.css'
 
 const SERVICIOS = [
-  { id: 'corte', nombre: 'Corte de pelo', precio: '$16.000' },
-  { id: 'corte_barba', nombre: 'Corte + Barba', precio: '$25.000' },
-  { id: 'barba', nombre: 'Solo Barba', precio: '$11.000' },
+  { id: 'corte', nombre: 'Corte de pelo', precio: '$16.000', duracion: 1 },
+  { id: 'corte_barba', nombre: 'Corte + Barba', precio: '$25.000', duracion: 1 },
+  { id: 'barba', nombre: 'Solo Barba', precio: '$11.000', duracion: 1 },
+  { id: 'globales', nombre: 'Globales', precio: '$60.000', duracion: 3 },
+  { id: 'mechas', nombre: 'Mechas', precio: '$50.000', duracion: 3 },
+  { id: 'permanente', nombre: 'Permanente', precio: '$50.000', duracion: 3 },
 ]
 
 const PAISES = [
@@ -27,10 +30,8 @@ const TEMPLATE_BARBERO = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_BARBERO
 const TEMPLATE_CLIENTE = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_CLIENTE
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
 
-// Hora actual en Argentina (UTC-3), actualizada cada minuto
 function getNowArgentina() {
   const now = new Date()
-  // Convertir a UTC-3
   const utc = now.getTime() + now.getTimezoneOffset() * 60000
   return new Date(utc - 3 * 60 * 60 * 1000)
 }
@@ -40,28 +41,8 @@ function esTurnoDeshabilitado(fechaTurno, horaTurno) {
   const [h, m] = horaTurno.split(':').map(Number)
   const turno = new Date(fechaTurno + 'T00:00:00')
   turno.setHours(h, m, 0, 0)
-
-  // Deshabilitar si faltan menos de 30 minutos o ya pasó
   const diffMs = turno.getTime() - ahora.getTime()
   return diffMs < 30 * 60 * 1000
-}
-
-function getFechasDisponibles() {
-  const fechas = []
-  const ahora = getNowArgentina()
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(ahora)
-    d.setDate(ahora.getDate() + i)
-    const dia = d.getDay()
-    if (dia >= 2 && dia <= 6) {
-      const fecha = d.toISOString().split('T')[0]
-      // Verificar que el día tenga al menos un horario disponible
-      const horarios = getHorariosParaDia(fecha)
-      const hayDisponibles = horarios.some(h => !esTurnoDeshabilitado(fecha, h))
-      if (hayDisponibles) fechas.push(fecha)
-    }
-  }
-  return fechas
 }
 
 function getHorariosParaDia(fecha) {
@@ -73,6 +54,32 @@ function getHorariosParaDia(fecha) {
   const horariosMañana = ['08:00', '09:00', '10:00', '11:00']
   if (dia === 2 || dia === 4) return [...horariosMañana, ...horariosTarde]
   return horariosTarde
+}
+
+function getFechasDisponibles() {
+  const fechas = []
+  const ahora = getNowArgentina()
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(ahora)
+    d.setDate(ahora.getDate() + i)
+    const dia = d.getDay()
+    if (dia >= 2 && dia <= 6) {
+      const fecha = d.toISOString().split('T')[0]
+      const horarios = getHorariosParaDia(fecha)
+      const hayDisponibles = horarios.some(h => !esTurnoDeshabilitado(fecha, h))
+      if (hayDisponibles) fechas.push(fecha)
+    }
+  }
+  return fechas
+}
+
+// Dado un turno reservado, calcula qué slots bloquear según su duración
+// Usa el array completo del día para encontrar los índices consecutivos
+function calcularHorasBloqueadas(horaInicio, duracion, fecha) {
+  const todos = getHorariosParaDia(fecha)
+  const idx = todos.indexOf(horaInicio)
+  if (idx === -1) return [horaInicio]
+  return todos.slice(idx, idx + duracion)
 }
 
 const DIAS_ES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
@@ -89,7 +96,6 @@ export default function Turno() {
   const [cargando, setCargando] = useState(false)
   const [ahora, setAhora] = useState(getNowArgentina())
 
-  // Actualizar el reloj cada 30 segundos para recalcular horarios
   useEffect(() => {
     const interval = setInterval(() => {
       setAhora(getNowArgentina())
@@ -105,15 +111,24 @@ export default function Turno() {
     const fetchOcupados = async () => {
       const { data } = await supabase
         .from('turnos')
-        .select('hora')
+        .select('hora, servicio')
         .eq('fecha', form.fecha)
         .eq('cancelado', false)
-      setHorariosOcupados(data ? data.map(t => t.hora.slice(0, 5)) : [])
+
+      const bloqueados = []
+      data?.forEach(t => {
+        const horaBase = t.hora.slice(0, 5)
+        const srv = SERVICIOS.find(s => s.id === t.servicio)
+        const duracion = srv?.duracion || 1
+        const horas = calcularHorasBloqueadas(horaBase, duracion, form.fecha)
+        horas.forEach(h => bloqueados.push(h))
+      })
+
+      setHorariosOcupados([...new Set(bloqueados)])
     }
     fetchOcupados()
   }, [form.fecha])
 
-  // Si el horario seleccionado se vuelve inválido por el tiempo, limpiarlo
   useEffect(() => {
     if (form.hora && form.fecha && esTurnoDeshabilitado(form.fecha, form.hora)) {
       setForm(prev => ({ ...prev, hora: '' }))
@@ -133,7 +148,6 @@ export default function Turno() {
     if (!form.direccion.trim()) return toast.error('Ingresá tu dirección')
     if (!aceptaTerminos) return toast.error('Debés aceptar los términos para continuar')
 
-    // Verificación final de tiempo
     if (esTurnoDeshabilitado(form.fecha, form.hora)) {
       toast.error('Este horario ya no está disponible. Elegí otro.')
       setForm(prev => ({ ...prev, hora: '' }))
@@ -142,16 +156,20 @@ export default function Turno() {
 
     setCargando(true)
 
+    const servicioSel = SERVICIOS.find(s => s.id === form.servicio)
+    const duracion = servicioSel?.duracion || 1
+    const horasARevisar = calcularHorasBloqueadas(form.hora, duracion, form.fecha)
+
     const { data: yaReservado } = await supabase
       .from('turnos')
       .select('id')
       .eq('fecha', form.fecha)
-      .eq('hora', form.hora)
+      .in('hora', horasARevisar)
       .eq('cancelado', false)
 
     if (yaReservado && yaReservado.length > 0) {
       toast.error('Ese turno ya fue reservado. Elegí otro horario.')
-      setHorariosOcupados(prev => [...prev, form.hora])
+      setHorariosOcupados(prev => [...new Set([...prev, ...horasARevisar])])
       setForm(prev => ({ ...prev, hora: '' }))
       setCargando(false)
       return
@@ -204,6 +222,7 @@ export default function Turno() {
       console.error('EmailJS error:', err)
     }
 
+    setHorariosOcupados(prev => [...new Set([...prev, ...horasARevisar])])
     setEnviado(true)
     setCargando(false)
   }
@@ -287,13 +306,16 @@ export default function Turno() {
           <div className={styles.field}>
             <label className={styles.label}>Servicio</label>
             <select name="servicio" value={form.servicio}
-              onChange={e => setForm({...form, servicio: e.target.value})}
+              onChange={e => setForm({...form, servicio: e.target.value, hora: ''})}
               className={styles.select}>
               <option value="">Elegí un servicio</option>
               {SERVICIOS.map(s => (
                 <option key={s.id} value={s.id}>{s.nombre} — {s.precio}</option>
               ))}
             </select>
+            {form.servicio && SERVICIOS.find(s => s.id === form.servicio)?.duracion === 3 && (
+              <span className={styles.hint}>⏱ Este servicio ocupa 3 horas seguidas.</span>
+            )}
           </div>
 
           <div className={styles.field}>
