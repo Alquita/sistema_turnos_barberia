@@ -99,7 +99,7 @@ export default function Turno() {
   useEffect(() => {
     const interval = setInterval(() => {
       setAhora(getNowArgentina())
-    }, 30000)
+    }, 10000)
     return () => clearInterval(interval)
   }, [])
 
