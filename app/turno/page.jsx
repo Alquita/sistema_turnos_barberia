@@ -16,13 +16,13 @@ const SERVICIOS = [
 ]
 
 const PAISES = [
-  { codigo: '🇦🇷 +54 9', valor: '549', placeholder: '3584001234', largo: 10 },
-  { codigo: '🇺🇾 +598', valor: '598', placeholder: '91234567', largo: 8 },
-  { codigo: '🇧🇴 +591', valor: '591', placeholder: '71234567', largo: 8 },
-  { codigo: '🇨🇱 +56', valor: '56', placeholder: '912345678', largo: 9 },
-  { codigo: '🇵🇾 +595', valor: '595', placeholder: '981234567', largo: 9 },
-  { codigo: '🇧🇷 +55', valor: '55', placeholder: '11912345678', largo: 11 },
-  { codigo: '🇪🇸 +34', valor: '34', placeholder: '612345678', largo: 9 },
+  { codigo: 'AR +54 9', valor: '549', placeholder: '3584001234', largo: 10 },
+  { codigo: 'UY +598', valor: '598', placeholder: '91234567', largo: 8 },
+  { codigo: 'BO +591', valor: '591', placeholder: '71234567', largo: 8 },
+  { codigo: 'CL +56', valor: '56', placeholder: '912345678', largo: 9 },
+  { codigo: 'PY +595', valor: '595', placeholder: '981234567', largo: 9 },
+  { codigo: 'BR +55', valor: '55', placeholder: '11912345678', largo: 11 },
+  { codigo: 'ES +34', valor: '34', placeholder: '612345678', largo: 9 },
 ]
 
 const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
