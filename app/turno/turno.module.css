@@ -71,7 +71,7 @@
     text-transform: uppercase;
   }
   
-  .input, .select {
+  .input {
     background: #0a0a0a;
     border: 1px solid #222;
     border-radius: 10px;
@@ -83,7 +83,7 @@
     font-family: inherit;
   }
   
-  .input:focus, .select:focus {
+  .input:focus {
     outline: none;
     border-color: #444;
   }
@@ -92,8 +92,158 @@
     color: #444;
   }
   
-  .select option {
-    background: #111;
+  .servDropdown {
+    position: relative;
+  }
+  
+  .servDropdownBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 11px 36px 11px 14px;
+    color: #fff;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    text-align: left;
+  }
+  
+  .servDropdownBtn:hover {
+    border-color: #444;
+  }
+  
+  .servDropdownBtn:focus-visible {
+    outline: none;
+    border-color: #444;
+  }
+
+  .servDropdownBtnActive {
+    border-color: #555;
+    background: #141414;
+  }
+
+  .servDropdownBtnActive .servIcon {
+    filter: brightness(2.5) drop-shadow(0 0 4px rgba(255,255,255,0.25));
+  }
+
+  .servDropdownBtnActive .servText {
+    color: #fff;
+  }
+
+  .servDropdownBtnActive .servPrice {
+    color: #aaa;
+  }
+
+  .servIcon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    filter: brightness(1.6);
+    flex-shrink: 0;
+    display: block;
+    transition: filter 0.2s;
+  }
+  
+  .servText {
+    flex: 1;
+    color: #ddd;
+    font-weight: 500;
+  }
+  
+  .servPrice {
+    color: #888;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  
+  .servPlaceholder {
+    flex: 1;
+    color: #555;
+    font-weight: 400;
+  }
+  
+  .servChevron {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #555;
+    transition: color 0.2s, transform 0.2s;
+    flex-shrink: 0;
+  }
+  
+  .servChevronOpen {
+    transform: translateY(-50%) rotate(180deg);
+  }
+  
+  .servDropdownMenu {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    animation: fadeIn 0.12s ease both;
+  }
+  
+  .servDropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 10px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    border-radius: 8px;
+    transition: background 0.12s;
+    text-align: left;
+    color: #ccc;
+    font-size: 14px;
+  }
+  
+  .servDropdownItem:hover {
+    background: #2a2a2a;
+  }
+  
+  .servDropdownItemActive {
+    background: #2a2a2a;
+    color: #fff;
+  }
+  
+  .servDropdownItemText {
+    flex: 1;
+    font-weight: 500;
+  }
+  
+  .servDropdownItemPrice {
+    color: #888;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+  
+  .servDropdownItemTag {
+    font-size: 9px;
+    font-weight: 600;
+    color: #666;
+    background: #222;
+    padding: 2px 6px;
+    border-radius: 100px;
+    margin-left: 4px;
+    flex-shrink: 0;
   }
   
   .hint {

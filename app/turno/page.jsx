@@ -7,12 +7,12 @@ import { supabase } from '../../lib/supabase'
 import styles from './turno.module.css'
 
 const SERVICIOS = [
-  { id: 'corte', nombre: 'Corte de pelo', precio: '$16.000', duracion: 1 },
-  { id: 'corte_barba', nombre: 'Corte + Barba', precio: '$25.000', duracion: 1 },
-  { id: 'barba', nombre: 'Solo Barba', precio: '$11.000', duracion: 1 },
-  { id: 'globales', nombre: 'Globales', precio: '$60.000', duracion: 3 },
-  { id: 'mechas', nombre: 'Mechas', precio: '$50.000', duracion: 3 },
-  { id: 'permanente', nombre: 'Permanente', precio: '$50.000', duracion: 3 },
+  { id: 'corte', icon: '/icons/scissors.svg', nombre: 'Corte de pelo', precio: '$16.000', duracion: 1 },
+  { id: 'corte_barba', icon: '/icons/crown.svg', nombre: 'Corte + Barba', precio: '$25.000', duracion: 1 },
+  { id: 'barba', icon: '/icons/user-check.svg', nombre: 'Solo Barba', precio: '$11.000', duracion: 1 },
+  { id: 'globales', icon: '/icons/sparkles.svg', nombre: 'Globales', precio: '$60.000', duracion: 3 },
+  { id: 'mechas', icon: '/icons/droplet.svg', nombre: 'Mechas', precio: '$50.000', duracion: 3 },
+  { id: 'permanente', icon: '/icons/waves.svg', nombre: 'Permanente', precio: '$50.000', duracion: 3 },
 ]
 
 const PAISES = [
@@ -110,6 +110,19 @@ export default function Turno() {
     const handleClick = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const [servDropdownOpen, setServDropdownOpen] = useState(false)
+  const servDropdownRef = useRef(null)
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (servDropdownRef.current && !servDropdownRef.current.contains(e.target)) {
+        setServDropdownOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -332,17 +345,44 @@ export default function Turno() {
 
           <div className={styles.field}>
             <label className={styles.label}>Servicio</label>
-            <select name="servicio" value={form.servicio}
-              onChange={e => setForm({...form, servicio: e.target.value, hora: ''})}
-              className={styles.select}>
-              <option value="">Elegí un servicio</option>
-              {SERVICIOS.map(s => (
-                <option key={s.id} value={s.id}>{s.nombre} — {s.precio}</option>
-              ))}
-            </select>
-            {form.servicio && SERVICIOS.find(s => s.id === form.servicio)?.duracion === 3 && (
-              <span className={styles.hint}>⏱ Este servicio ocupa 3 horas seguidas.</span>
-            )}
+            <div className={styles.servDropdown} ref={servDropdownRef}>
+              <button type="button"
+                className={`${styles.servDropdownBtn} ${form.servicio ? styles.servDropdownBtnActive : ''}`}
+                onClick={() => setServDropdownOpen(!servDropdownOpen)}>
+                {(() => {
+                  const sel = SERVICIOS.find(s => s.id === form.servicio)
+                  return sel ? (
+                    <>
+                      <img src={sel.icon} alt="" className={styles.servIcon} />
+                      <span className={styles.servText}>{sel.nombre}</span>
+                      <span className={styles.servPrice}>{sel.precio}</span>
+                    </>
+                  ) : (
+                    <span className={styles.servPlaceholder}>Elegí un servicio</span>
+                  )
+                })()}
+                <svg className={`${styles.servChevron} ${servDropdownOpen ? styles.servChevronOpen : ''}`} width="12" height="8" viewBox="0 0 12 8" fill="none">
+                  <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              {servDropdownOpen && (
+                <div className={styles.servDropdownMenu}>
+                  {SERVICIOS.map(s => (
+                    <button key={s.id} type="button"
+                      className={`${styles.servDropdownItem} ${form.servicio === s.id ? styles.servDropdownItemActive : ''}`}
+                      onClick={() => {
+                        setForm({...form, servicio: s.id, hora: ''})
+                        setServDropdownOpen(false)
+                      }}>
+                      <img src={s.icon} alt="" className={styles.servIcon} />
+                      <span className={styles.servDropdownItemText}>{s.nombre}</span>
+                      <span className={styles.servDropdownItemPrice}>{s.precio}</span>
+                      {s.duracion > 1 && <span className={styles.servDropdownItemTag}>⏱ {s.duracion}h</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className={styles.field}>
