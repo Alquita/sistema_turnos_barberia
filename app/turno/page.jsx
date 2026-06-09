@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import emailjs from '@emailjs/browser'
 import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
@@ -16,13 +16,13 @@ const SERVICIOS = [
 ]
 
 const PAISES = [
-  { codigo: '🇦🇷 AR +54 9', valor: '549', placeholder: '3584001234', largo: 10 },
-  { codigo: '🇺🇾 UY +598', valor: '598', placeholder: '91234567', largo: 8 },
-  { codigo: '🇧🇴 BO +591', valor: '591', placeholder: '71234567', largo: 8 },
-  { codigo: '🇨🇱 CL +56', valor: '56', placeholder: '912345678', largo: 9 },
-  { codigo: '🇵🇾 PY +595', valor: '595', placeholder: '981234567', largo: 9 },
-  { codigo: '🇧🇷 BR +55', valor: '55', placeholder: '11912345678', largo: 11 },
-  { codigo: '🇪🇸 ES +34', valor: '34', placeholder: '612345678', largo: 9 },
+  { codigo: 'AR +54 9', valor: '549', bandera: '/flags/ar.svg', placeholder: '3584001234', largo: 10 },
+  { codigo: 'UY +598', valor: '598', bandera: '/flags/uy.svg', placeholder: '91234567', largo: 8 },
+  { codigo: 'BO +591', valor: '591', bandera: '/flags/bo.svg', placeholder: '71234567', largo: 8 },
+  { codigo: 'CL +56', valor: '56', bandera: '/flags/cl.svg', placeholder: '912345678', largo: 9 },
+  { codigo: 'PY +595', valor: '595', bandera: '/flags/py.svg', placeholder: '981234567', largo: 9 },
+  { codigo: 'BR +55', valor: '55', bandera: '/flags/br.svg', placeholder: '11912345678', largo: 11 },
+  { codigo: 'ES +34', valor: '34', bandera: '/flags/es.svg', placeholder: '612345678', largo: 9 },
 ]
 
 const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
@@ -101,6 +101,19 @@ export default function Turno() {
       setAhora(getNowArgentina())
     }, 10000)
     return () => clearInterval(interval)
+  }, [])
+
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
   const fechas = getFechasDisponibles()
@@ -267,18 +280,32 @@ export default function Turno() {
             <div className={styles.field}>
               <label className={styles.label}>Teléfono / WhatsApp</label>
               <div className={styles.telefonoWrap}>
-                <select
-                  className={styles.paisSelect}
-                  value={paisSeleccionado.valor}
-                  onChange={e => {
-                    const p = PAISES.find(p => p.valor === e.target.value)
-                    setPaisSeleccionado(p)
-                    setForm({...form, telefono: ''})
-                  }}>
-                  {PAISES.map(p => (
-                    <option key={p.valor} value={p.valor}>{p.codigo}</option>
-                  ))}
-                </select>
+                <div className={styles.paisDropdown} ref={dropdownRef}>
+                  <button type="button" className={styles.paisDropdownBtn}
+                    onClick={() => setDropdownOpen(!dropdownOpen)}>
+                    <img src={paisSeleccionado.bandera} alt="" className={styles.paisBandera} />
+                    <span className={styles.paisDropdownText}>{paisSeleccionado.codigo}</span>
+                    <svg className={`${styles.paisChevron} ${dropdownOpen ? styles.paisChevronOpen : ''}`} width="10" height="6" viewBox="0 0 10 6" fill="none">
+                      <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  {dropdownOpen && (
+                    <div className={styles.paisDropdownMenu}>
+                      {PAISES.map(p => (
+                        <button key={p.valor} type="button"
+                          className={`${styles.paisDropdownItem} ${p.valor === paisSeleccionado.valor ? styles.paisDropdownItemActive : ''}`}
+                          onClick={() => {
+                            setPaisSeleccionado(p)
+                            setForm({...form, telefono: ''})
+                            setDropdownOpen(false)
+                          }}>
+                          <img src={p.bandera} alt="" className={styles.paisBandera} />
+                          <span>{p.codigo}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <input
                   name="telefono"
                   value={form.telefono}
