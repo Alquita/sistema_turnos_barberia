@@ -15,7 +15,7 @@ export const metadata = {
   other: {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'apple-mobile-web-app-title': 'Cepeha Fade Club',
+    'apple-mobile-web-app-title': 'Cepeha Club',
     'theme-color': '#0a0a0a',
   },
 }
