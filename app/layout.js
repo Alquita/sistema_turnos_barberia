@@ -1,7 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './globals.css'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
 import ToasterProvider from './components/ToasterProvider'
 import RegisterSW from './components/RegisterSW'
 
@@ -24,9 +22,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body style={{ background: '#0a0a0a', color: '#fff', margin: 0 }}>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        {children}
         <ToasterProvider />
         <RegisterSW />
       </body>

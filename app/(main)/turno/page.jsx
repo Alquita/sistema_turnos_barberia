@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import emailjs from '@emailjs/browser'
 import toast from 'react-hot-toast'
-import { supabase } from '../../lib/supabase'
+import { supabase } from '../../../lib/supabase'
 import styles from './turno.module.css'
 
 const SERVICIOS = [
