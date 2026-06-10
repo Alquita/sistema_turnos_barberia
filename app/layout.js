@@ -3,10 +3,21 @@ import './globals.css'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ToasterProvider from './components/ToasterProvider'
+import RegisterSW from './components/RegisterSW'
 
 export const metadata = {
   title: 'Cepeha Fade Club',
   description: 'Tu barbero a domicilio en Río Cuarto',
+  manifest: '/manifest.json',
+  icons: {
+    apple: '/icons/apple-icon-180x180.png',
+  },
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'apple-mobile-web-app-title': 'Cepeha',
+    'theme-color': '#0a0a0a',
+  },
 }
 
 export default function RootLayout({ children }) {
@@ -17,6 +28,7 @@ export default function RootLayout({ children }) {
         <main>{children}</main>
         <Footer />
         <ToasterProvider />
+        <RegisterSW />
       </body>
     </html>
   )
