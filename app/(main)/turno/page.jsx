@@ -129,6 +129,19 @@ export default function Turno() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
+  const [datosGuardados, setDatosGuardados] = useState(false)
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('cliente_cepeha')
+      if (saved) {
+        const data = JSON.parse(saved)
+        setForm(prev => ({ ...prev, ...data }))
+        setDatosGuardados(true)
+      }
+    } catch {}
+  }, [])
+
   const fechas = getFechasDisponibles()
   const horarios = getHorariosParaDia(form.fecha)
 
@@ -248,9 +261,23 @@ export default function Turno() {
       console.error('EmailJS error:', err)
     }
 
+    try {
+      localStorage.setItem('cliente_cepeha', JSON.stringify({
+        nombre: form.nombre,
+        telefono: form.telefono,
+        email: form.email,
+        direccion: form.direccion,
+      }))
+    } catch {}
+
     setHorariosOcupados(prev => [...new Set([...prev, ...horasARevisar])])
     setEnviado(true)
     setCargando(false)
+  }
+
+  const limpiarDatosGuardados = () => {
+    try { localStorage.removeItem('cliente_cepeha') } catch {}
+    setDatosGuardados(false)
   }
 
   const resetForm = () => {
@@ -287,7 +314,7 @@ export default function Turno() {
               <label className={styles.label}>Nombre completo</label>
               <input name="nombre" value={form.nombre}
                 onChange={e => setForm({...form, nombre: e.target.value})}
-                placeholder="Juan García" className={styles.input} />
+                placeholder="Juan García" className={styles.input} autoComplete="name" />
             </div>
 
             <div className={styles.field}>
@@ -329,6 +356,7 @@ export default function Turno() {
                   placeholder={paisSeleccionado.placeholder}
                   className={styles.telefonoInput}
                   inputMode="numeric"
+                  autoComplete="tel"
                 />
               </div>
               <span className={styles.hint}>Sin el 0 ni el 15. Ej: {paisSeleccionado.placeholder}</span>
@@ -339,7 +367,7 @@ export default function Turno() {
             <label className={styles.label}>Email</label>
             <input type="email" name="email" value={form.email}
               onChange={e => setForm({...form, email: e.target.value})}
-              placeholder="tucorreo@gmail.com" className={styles.input} />
+              placeholder="tucorreo@gmail.com" className={styles.input} autoComplete="email" />
             <span className={styles.hint}>Te enviamos la confirmación y el link para cancelar a este correo.</span>
           </div>
 
@@ -435,7 +463,7 @@ export default function Turno() {
             <input name="direccion" value={form.direccion}
               onChange={e => setForm({...form, direccion: e.target.value})}
               placeholder="Ej: San Martín 456, Río Cuarto"
-              className={styles.input} />
+              className={styles.input} autoComplete="street-address" />
             <span className={styles.hint}>Solo realizamos servicios dentro de Río Cuarto.</span>
           </div>
 
@@ -453,6 +481,12 @@ export default function Turno() {
           <button type="submit" disabled={cargando} className={styles.btnPrimary}>
             {cargando ? 'Enviando...' : 'Confirmar turno →'}
           </button>
+
+          {datosGuardados && (
+            <button type="button" onClick={limpiarDatosGuardados} className={styles.btnOlvidar}>
+              Olvidar mis datos
+            </button>
+          )}
 
         </form>
       </div>
