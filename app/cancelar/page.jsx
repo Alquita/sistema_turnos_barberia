@@ -44,9 +44,14 @@ function CancelarContent() {
   useEffect(() => {
     if (!turnoData) return
     const calcular = () => {
-      const createdAt = parseUTC(turnoData.created_at)
-      const transcurridoMs = Date.now() - createdAt.getTime()
-      const restanteMs = (30 * 60 * 1000) - transcurridoMs
+      // Construir la fecha/hora del turno
+      const [h, m] = turnoData.hora.slice(0, 5).split(':').map(Number)
+      const fechaTurno = new Date(turnoData.fecha + 'T00:00:00')
+      fechaTurno.setHours(h, m, 0, 0)
+
+      // Límite = 30 minutos antes del turno
+      const limite = new Date(fechaTurno.getTime() - 30 * 60 * 1000)
+      const restanteMs = limite.getTime() - Date.now()
 
       if (restanteMs <= 0) {
         setTiempoRestante({ mins: 0, segs: 0, porcentaje: 0 })
@@ -54,7 +59,10 @@ function CancelarContent() {
       } else {
         const mins = Math.floor(restanteMs / 60000)
         const segs = Math.floor((restanteMs % 60000) / 1000)
-        const porcentaje = (restanteMs / (30 * 60 * 1000)) * 100
+        // Para el porcentaje usamos el tiempo total desde creación hasta límite
+        const createdAt = parseUTC(turnoData.created_at)
+        const totalMs = limite.getTime() - createdAt.getTime()
+        const porcentaje = Math.min(100, (restanteMs / totalMs) * 100)
         setTiempoRestante({ mins, segs, porcentaje })
         setPuedeCancelar(true)
       }
@@ -137,20 +145,20 @@ function CancelarContent() {
                 <div className={styles.timerOk}>
                   <div className={styles.timerLabel}>⏱ Tiempo para cancelar</div>
                   <div className={styles.timerClock}>
-                    {String(tiempoRestante.mins).padStart(2, '0')}
-                    <span className={styles.timerDots}>:</span>
-                    {String(tiempoRestante.segs).padStart(2, '0')}
+                    {String(Math.floor(tiempoRestante.mins / 60)).padStart(2, '0')}h{' '}
+                    {String(tiempoRestante.mins % 60).padStart(2, '0')}m{' '}
+                    {String(tiempoRestante.segs).padStart(2, '0')}s
                   </div>
                   <div className={styles.timerBar}>
                     <div className={styles.timerBarFill}
                       style={{ width: `${tiempoRestante.porcentaje}%` }} />
                   </div>
-                  <div className={styles.timerSub}>minutos restantes para cancelar</div>
+                  <div className={styles.timerSub}>podés cancelar hasta 30 min antes de tu turno</div>
                 </div>
               ) : (
                 <div className={styles.timerVencido}>
                   <div className={styles.timerClockRed}>00:00</div>
-                  <p style={{ margin: '8px 0 0', fontSize: 13 }}>⛔ El período de cancelación venció. Contactá al barbero.</p>
+                  <p style={{ margin: '8px 0 0', fontSize: 13 }}>⛔ Faltan menos de 30 minutos para tu turno. Contactá al barbero para cancelar.</p>
                 </div>
               )
             )}

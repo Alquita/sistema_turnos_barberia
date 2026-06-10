@@ -18,12 +18,17 @@ export async function POST(req) {
   if (turno.cancelado) return Response.json({ error: 'El turno ya fue cancelado' }, { status: 400 })
 
   if (!esBarbero) {
-    const createdAt = parseUTC(turno.created_at)
-    const transcurridoMs = Date.now() - createdAt.getTime()
-    const diffMinutos = transcurridoMs / 60000
-    if (diffMinutos > 30) {
+    // Construir la fecha/hora del turno
+    const [h, m] = turno.hora.slice(0, 5).split(':').map(Number)
+    const fechaTurno = new Date(turno.fecha + 'T00:00:00')
+    fechaTurno.setHours(h, m, 0, 0)
+
+    // Límite = 30 minutos antes del turno
+    const limite = new Date(fechaTurno.getTime() - 30 * 60 * 1000)
+
+    if (Date.now() > limite.getTime()) {
       return Response.json({ 
-        error: 'El período de cancelación de 30 minutos ya venció. Si necesitás cancelar, contactá al barbero directamente.' 
+        error: 'El período de cancelación venció. Faltan menos de 30 minutos para tu turno. Contactá al barbero directamente.' 
       }, { status: 403 })
     }
   }
