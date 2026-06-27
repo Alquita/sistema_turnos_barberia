@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import emailjs from '@emailjs/browser'
 import styles from './barbero.module.css'
@@ -56,9 +56,31 @@ export default function Barbero() {
   const [excHorarios, setExcHorarios] = useState([])
   const [excCustomManiana, setExcCustomManiana] = useState('')
   const [excCustomTarde, setExcCustomTarde] = useState('')
+  const [datePickerOpen, setDatePickerOpen] = useState(false)
+  const pickerRef = useRef(null)
 
   const [msg, setMsg] = useState('')
   const [msgTipo, setMsgTipo] = useState('')
+
+  const hoy = new Date()
+  const fechas = []
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(hoy)
+    d.setDate(hoy.getDate() + i)
+    if (d.getDay() >= 2 && d.getDay() <= 6) {
+      fechas.push(d.toISOString().split('T')[0])
+    }
+  }
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+        setDatePickerOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   // Recuperar token de localStorage
   useEffect(() => {
@@ -450,12 +472,37 @@ export default function Barbero() {
 
             <div className={styles.modalField}>
               <label className={styles.modalLabel}>Fecha</label>
-              <input
-                type="date"
-                value={excFecha}
-                onChange={e => { setExcFecha(e.target.value); setExcHorarios([]) }}
-                className={styles.modalInput}
-              />
+              <div className={styles.datePickerWrap}>
+                <button type="button" onClick={() => setDatePickerOpen(!datePickerOpen)} className={styles.datePickerBtn}>
+                  <span className={styles.datePickerIcon}>📅</span>
+                  <span className={styles.datePickerText}>{excFecha ? formatearFecha(excFecha) : 'Elegí una fecha'}</span>
+                  <svg className={`${styles.datePickerChevron} ${datePickerOpen ? styles.datePickerChevronOpen : ''}`} width="10" height="6" viewBox="0 0 10 6" fill="none">
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                {datePickerOpen && (
+                  <div className={styles.datePickerPopup} ref={pickerRef}>
+                    <div className={styles.datePickerGrid}>
+                      {fechas.map(f => {
+                        const d = new Date(f + 'T00:00:00')
+                        const tieneExc = excepciones.some(e => e.fecha === f)
+                        return (
+                          <button
+                            key={f}
+                            type="button"
+                            onClick={() => { setExcFecha(f); setExcHorarios(tieneExc ? excepciones.find(e => e.fecha === f).horarios : []); setDatePickerOpen(false) }}
+                            className={`${styles.datePickerFechaBtn} ${excFecha === f ? styles.datePickerFechaBtnActive : ''} ${tieneExc ? styles.datePickerFechaBtnExc : ''}`}
+                          >
+                            <span className={styles.datePickerFechaDia}>{DIAS_ES[d.getDay()]}</span>
+                            <span className={styles.datePickerFechaNum}>{d.getDate()}</span>
+                            <span className={styles.datePickerFechaMes}>{MESES_ES[d.getMonth()]}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {excFecha && (
