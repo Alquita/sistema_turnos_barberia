@@ -45,18 +45,20 @@ function esTurnoDeshabilitado(fechaTurno, horaTurno) {
   return diffMs < 30 * 60 * 1000
 }
 
-function getHorariosParaDia(fecha) {
+function getHorariosParaDia(fecha, excepcionesMap = {}) {
   if (!fecha) return []
+  if (excepcionesMap[fecha]) return excepcionesMap[fecha]
   const dia = new Date(fecha + 'T00:00:00').getDay()
   const esDiaHabil = dia >= 2 && dia <= 6
   if (!esDiaHabil) return []
   const horariosTarde = ['16:00', '17:00', '18:00', '19:00', '20:00']
   const horariosMañana = ['08:00', '09:00', '10:00', '11:00']
+  if (dia === 6) return ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00']
   if (dia === 2 || dia === 4) return [...horariosMañana, ...horariosTarde]
   return horariosTarde
 }
 
-function getFechasDisponibles() {
+function getFechasDisponibles(excepcionesMap = {}) {
   const fechas = []
   const ahora = getNowArgentina()
   for (let i = 0; i < 14; i++) {
@@ -65,7 +67,7 @@ function getFechasDisponibles() {
     const dia = d.getDay()
     if (dia >= 2 && dia <= 6) {
       const fecha = d.toISOString().split('T')[0]
-      const horarios = getHorariosParaDia(fecha)
+      const horarios = getHorariosParaDia(fecha, excepcionesMap)
       const hayDisponibles = horarios.some(h => !esTurnoDeshabilitado(fecha, h))
       if (hayDisponibles) fechas.push(fecha)
     }
@@ -73,10 +75,8 @@ function getFechasDisponibles() {
   return fechas
 }
 
-// Dado un turno reservado, calcula qué slots bloquear según su duración
-// Usa el array completo del día para encontrar los índices consecutivos
-function calcularHorasBloqueadas(horaInicio, duracion, fecha) {
-  const todos = getHorariosParaDia(fecha)
+function calcularHorasBloqueadas(horaInicio, duracion, fecha, excepcionesMap = {}) {
+  const todos = getHorariosParaDia(fecha, excepcionesMap)
   const idx = todos.indexOf(horaInicio)
   if (idx === -1) return [horaInicio]
   return todos.slice(idx, idx + duracion)
@@ -95,12 +95,24 @@ export default function Turno() {
   const [enviado, setEnviado] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [ahora, setAhora] = useState(getNowArgentina())
+  const [excepciones, setExcepciones] = useState({})
 
   useEffect(() => {
     const interval = setInterval(() => {
       setAhora(getNowArgentina())
     }, 10000)
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    supabase
+      .from('excepciones_horarios')
+      .select('fecha, horarios')
+      .then(({ data }) => {
+        const map = {}
+        data?.forEach(e => { map[e.fecha] = e.horarios })
+        setExcepciones(map)
+      })
   }, [])
 
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -142,8 +154,8 @@ export default function Turno() {
     } catch {}
   }, [])
 
-  const fechas = getFechasDisponibles()
-  const horarios = getHorariosParaDia(form.fecha)
+  const fechas = getFechasDisponibles(excepciones)
+  const horarios = getHorariosParaDia(form.fecha, excepciones)
 
   useEffect(() => {
     if (!form.fecha) return
@@ -159,7 +171,7 @@ export default function Turno() {
         const horaBase = t.hora.slice(0, 5)
         const srv = SERVICIOS.find(s => s.id === t.servicio)
         const duracion = srv?.duracion || 1
-        const horas = calcularHorasBloqueadas(horaBase, duracion, form.fecha)
+        const horas = calcularHorasBloqueadas(horaBase, duracion, form.fecha, excepciones)
         horas.forEach(h => bloqueados.push(h))
       })
 
@@ -197,7 +209,7 @@ export default function Turno() {
 
     const servicioSel = SERVICIOS.find(s => s.id === form.servicio)
     const duracion = servicioSel?.duracion || 1
-    const horasARevisar = calcularHorasBloqueadas(form.hora, duracion, form.fecha)
+    const horasARevisar = calcularHorasBloqueadas(form.hora, duracion, form.fecha, excepciones)
 
     const { data: yaReservado } = await supabase
       .from('turnos')

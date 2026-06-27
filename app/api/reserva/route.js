@@ -17,11 +17,24 @@ function esTurnoDeshabilitado(fecha, hora) {
   return (turno.getTime() - ahora.getTime()) < 30 * 60 * 1000
 }
 
-function calcularHorasBloqueadas(horaInicio, duracion, fecha) {
+async function getHorariosParaFecha(fecha) {
+  const { data } = await supabase
+    .from('excepciones_horarios')
+    .select('horarios')
+    .eq('fecha', fecha)
+    .single()
+  if (data) return data.horarios
+
   const horariosTarde = ['16:00', '17:00', '18:00', '19:00', '20:00']
   const horariosMañana = ['08:00', '09:00', '10:00', '11:00']
   const dia = new Date(fecha + 'T00:00:00').getDay()
-  const todos = (dia === 2 || dia === 4) ? [...horariosMañana, ...horariosTarde] : horariosTarde
+  if (dia === 6) return ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00']
+  if (dia === 2 || dia === 4) return [...horariosMañana, ...horariosTarde]
+  return horariosTarde
+}
+
+async function calcularHorasBloqueadas(horaInicio, duracion, fecha) {
+  const todos = await getHorariosParaFecha(fecha)
   const idx = todos.indexOf(horaInicio)
   if (idx === -1) return [horaInicio]
   return todos.slice(idx, idx + duracion)
@@ -40,7 +53,7 @@ export async function POST(req) {
   }
 
   const duracion = DURACIONES[servicio] || 1
-  const horasARevisar = calcularHorasBloqueadas(hora, duracion, fecha)
+  const horasARevisar = await calcularHorasBloqueadas(hora, duracion, fecha)
 
   const { data: existentes } = await supabase
     .from('turnos')
