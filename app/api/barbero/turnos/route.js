@@ -1,16 +1,5 @@
-import { supabase } from '@/lib/supabase'
-import crypto from 'crypto'
-
-function verificarToken(auth) {
-  if (!auth) return false
-  const [timestamp, signature] = auth.replace('Bearer ', '').split(':')
-  if (!timestamp || !signature) return false
-  if (Date.now() - parseInt(timestamp) > 24 * 60 * 60 * 1000) return false
-  const expected = crypto.createHmac('sha256', process.env.BARBERO_PASSWORD)
-    .update(`${timestamp}:${process.env.BARBERO_PASSWORD}`)
-    .digest('hex')
-  return signature === expected
-}
+import { supabaseAdmin as supabase } from '@/lib/supabaseAdmin'
+import { verificarToken } from '@/lib/barberoAuth'
 
 export async function GET(req) {
   if (!verificarToken(req.headers.get('authorization'))) {
