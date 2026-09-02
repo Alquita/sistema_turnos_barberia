@@ -1,4 +1,4 @@
-import { supabase } from '../../../lib/supabase'
+import { supabaseAdmin as supabase } from '@/lib/supabaseAdmin'
 
 const DURACIONES = {
   corte: 1, corte_barba: 1, barba: 1,

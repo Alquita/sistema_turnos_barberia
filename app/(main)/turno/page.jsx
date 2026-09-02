@@ -160,14 +160,11 @@ export default function Turno() {
   useEffect(() => {
     if (!form.fecha) return
     const fetchOcupados = async () => {
-      const { data } = await supabase
-        .from('turnos')
-        .select('hora, servicio')
-        .eq('fecha', form.fecha)
-        .eq('cancelado', false)
+      const res = await fetch(`/api/disponibilidad?fecha=${form.fecha}`)
+      const data = await res.json()
 
       const bloqueados = []
-      data?.forEach(t => {
+      data.ocupados?.forEach(t => {
         const horaBase = t.hora.slice(0, 5)
         const srv = SERVICIOS.find(s => s.id === t.servicio)
         const duracion = srv?.duracion || 1
@@ -211,23 +208,10 @@ export default function Turno() {
     const duracion = servicioSel?.duracion || 1
     const horasARevisar = calcularHorasBloqueadas(form.hora, duracion, form.fecha, excepciones)
 
-    const { data: yaReservado } = await supabase
-      .from('turnos')
-      .select('id')
-      .eq('fecha', form.fecha)
-      .in('hora', horasARevisar)
-      .eq('cancelado', false)
-
-    if (yaReservado && yaReservado.length > 0) {
-      toast.error('Ese turno ya fue reservado. Elegí otro horario.')
-      setHorariosOcupados(prev => [...new Set([...prev, ...horasARevisar])])
-      setForm(prev => ({ ...prev, hora: '' }))
-      setCargando(false)
-      return
-    }
-
     const telefonoCompleto = `${paisSeleccionado.valor}${form.telefono}`
 
+    // El chequeo de colisión lo hace /api/reserva (devuelve 409 si el horario ya
+    // fue tomado). Ya no leemos la tabla turnos desde el browser.
     const res = await fetch('/api/reserva', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -236,7 +220,13 @@ export default function Turno() {
     const data = await res.json()
 
     if (!data.success) {
-      toast.error('Hubo un error al guardar. Intentá de nuevo.')
+      if (res.status === 409) {
+        toast.error(data.error || 'Ese turno ya fue reservado. Elegí otro horario.')
+        setHorariosOcupados(prev => [...new Set([...prev, ...horasARevisar])])
+        setForm(prev => ({ ...prev, hora: '' }))
+      } else {
+        toast.error(data.error || 'Hubo un error al guardar. Intentá de nuevo.')
+      }
       setCargando(false)
       return
     }

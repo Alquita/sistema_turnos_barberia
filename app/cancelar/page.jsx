@@ -3,11 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
-import emailjs from '@emailjs/browser'
 import styles from './cancelar.module.css'
-
-const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
-const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
 
 function parseUTC(dateStr) {
   if (!dateStr) return new Date()
@@ -77,7 +73,7 @@ function CancelarContent() {
     const res = await fetch('/api/cancelar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, esBarbero: false }),
+      body: JSON.stringify({ token, origen: 'cliente' }),
     })
     const data = await res.json()
     if (!data.success) {
@@ -85,23 +81,7 @@ function CancelarContent() {
       setMensaje(data.error)
       return
     }
-    try {
-      await emailjs.send(SERVICE_ID, 'template_hdise3m', {
-        nombre: data.turno.nombre,
-        fecha: data.turno.fecha,
-        hora: data.turno.hora,
-        direccion: data.turno.direccion,
-        telefono: data.turno.telefono,
-        email_cliente: data.turno.email,
-        servicio: data.turno.servicio,
-        maps_link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.turno.direccion + ', Río Cuarto, Córdoba')}`,
-        cancel_link: '',
-        cancel_link_barbero: '',
-        mensaje_extra: '⚠️ Este cliente CANCELÓ su turno. El horario quedó libre nuevamente.',
-      }, PUBLIC_KEY)
-    } catch (e) {
-      console.error('Email error:', e)
-    }
+    // El aviso al barbero lo manda /api/cancelar desde el servidor.
     setEstado('success')
   }
 

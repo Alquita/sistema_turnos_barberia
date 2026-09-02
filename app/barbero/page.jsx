@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from '@/lib/supabase'
 import emailjs from '@emailjs/browser'
 import styles from './barbero.module.css'
 
@@ -162,25 +161,16 @@ export default function Barbero() {
 
     const res = await fetch('/api/cancelar', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: turno.token_cancelacion, esBarbero: true }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ token: turno.token_cancelacion, origen: 'barbero' }),
     })
     const data = await res.json()
 
     if (data.success) {
-      try {
-        await emailjs.send(SERVICE_ID, TEMPLATE_CLIENTE, {
-          nombre: turno.nombre,
-          email_cliente: turno.email,
-          servicio: SERVICIOS.find(s => s.id === turno.servicio)?.nombre || turno.servicio,
-          fecha: turno.fecha,
-          hora: turno.hora,
-          direccion: turno.direccion,
-          cancel_link: '',
-          maps_link: '',
-          mensaje_cancelacion: '⚠️ Tu turno fue cancelado por el barbero.',
-        }, PUBLIC_KEY)
-      } catch {}
+      // El aviso al cliente lo manda /api/cancelar desde el servidor.
       mostrarMsg('Turno cancelado', 'success')
       cargarDatos()
     } else {
