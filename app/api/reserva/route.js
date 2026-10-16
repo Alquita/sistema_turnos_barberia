@@ -72,7 +72,10 @@ export async function POST(req) {
     .select()
     .single()
 
-  if (sbError) return Response.json({ error: 'Error al guardar el turno' }, { status: 500 })
+  if (sbError) {
+    console.error('[reserva POST]', sbError)
+    return Response.json({ error: 'Error al guardar el turno' }, { status: 500 })
+  }
 
   const baseUrl = process.env.NEXT_PUBLIC_URL
   const cancelLink = `${baseUrl}/cancelar?token=${turno.token_cancelacion}`

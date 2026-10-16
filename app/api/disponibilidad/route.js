@@ -18,6 +18,7 @@ export async function GET(req) {
     .eq('cancelado', false)
 
   if (error) {
+    console.error('[disponibilidad GET]', error)
     return Response.json({ error: 'Error al consultar disponibilidad' }, { status: 500 })
   }
 

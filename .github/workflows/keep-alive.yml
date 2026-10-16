@@ -1,0 +1,28 @@
+name: Keep-alive Supabase
+
+# El free tier de Supabase pausa el proyecto después de 7 días sin actividad.
+# Este workflow hace un SELECT simple cada 5 días para que nunca llegue a ese límite.
+on:
+  schedule:
+    - cron: '0 12 */5 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping a Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          # excepciones_horarios tiene policy de SELECT público, así que anda con la anon key
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/excepciones_horarios?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "Respuesta de Supabase: HTTP $status"
+          if [ "$status" != "200" ]; then
+            echo "El ping falló, revisá si el proyecto está pausado"
+            exit 1
+          fi

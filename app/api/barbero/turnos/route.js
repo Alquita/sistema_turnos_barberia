@@ -17,7 +17,10 @@ export async function GET(req) {
     .order('fecha', { ascending: true })
     .order('hora', { ascending: true })
 
-  if (error) return Response.json({ error: 'Error al obtener turnos' }, { status: 500 })
+  if (error) {
+    console.error('[barbero/turnos GET]', error)
+    return Response.json({ error: 'Error al obtener turnos' }, { status: 500 })
+  }
 
   return Response.json({ turnos: data })
 }
@@ -38,7 +41,10 @@ export async function POST(req) {
     .select()
     .single()
 
-  if (error) return Response.json({ error: 'Error al crear el turno' }, { status: 500 })
+  if (error) {
+    console.error('[barbero/turnos POST]', error)
+    return Response.json({ error: 'Error al crear el turno' }, { status: 500 })
+  }
 
   const baseUrl = process.env.NEXT_PUBLIC_URL
   const cancelLink = `${baseUrl}/cancelar?token=${turno.token_cancelacion}`
@@ -67,6 +73,7 @@ export async function PUT(req) {
     .single()
 
   if (error || !turno) {
+    console.error('[barbero/turnos PUT]', error)
     return Response.json({ error: 'Error al actualizar el turno' }, { status: 500 })
   }
 

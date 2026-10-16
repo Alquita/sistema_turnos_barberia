@@ -11,7 +11,10 @@ export async function GET(req) {
     .select('*')
     .order('fecha', { ascending: true })
 
-  if (error) return Response.json({ error: 'Error al obtener excepciones' }, { status: 500 })
+  if (error) {
+    console.error('[barbero/excepciones GET]', error)
+    return Response.json({ error: 'Error al obtener excepciones' }, { status: 500 })
+  }
 
   return Response.json({ excepciones: data })
 }
@@ -48,7 +51,10 @@ export async function POST(req) {
       .single()
   }
 
-  if (result.error) return Response.json({ error: 'Error al guardar' }, { status: 500 })
+  if (result.error) {
+    console.error('[barbero/excepciones POST]', result.error)
+    return Response.json({ error: 'Error al guardar' }, { status: 500 })
+  }
 
   return Response.json({ success: true, excepcion: result.data })
 }
@@ -63,7 +69,10 @@ export async function DELETE(req) {
 
   const { error } = await supabase.from('excepciones_horarios').delete().eq('id', id)
 
-  if (error) return Response.json({ error: 'Error al eliminar' }, { status: 500 })
+  if (error) {
+    console.error('[barbero/excepciones DELETE]', error)
+    return Response.json({ error: 'Error al eliminar' }, { status: 500 })
+  }
 
   return Response.json({ success: true })
 }
